@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+Hello symfony with OS {{ os }}
+<table>
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Content</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for  dinosaur in dinosaurs %}
+        <tr>
+            <td>{{ dinosaur.id }}</td>
+            <td>{{ dinosaur.name }}</td>
+            <td>{{ dinosaur.content }}</td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+{% endblock %}
