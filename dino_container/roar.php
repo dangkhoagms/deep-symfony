@@ -1,42 +1,25 @@
 <?php
 namespace Dino\play;
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 require __DIR__.'/../vendor/autoload.php';
 $container = new ContainerBuilder();
+$container->setParameter('root_dir',__DIR__);
 
-$handle = new StreamHandler(__DIR__.'/dino.log');
-$container->set('logger.stream_handle',$handle);
+$start = microtime(true);
 
-$loggerDefinition = new Definition('Monolog\Logger');
-$loggerDefinition->setArguments(array(
-    'main',
-    array(new Reference('logger.stream_handle'))
-));
-$loggerDefinition->addMethodCall('debug',array(
-    'The logger just got started'
-));
-$container->setDefinition('logger',$loggerDefinition);
+$loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/config'));
+$loader->load('services.yml');
 
-
-$handleDefinition = new Definition('Monolog\Handler\StreamHandler');
-$handleDefinition->setArguments(array(
-    __DIR__.'/dino.log'
-));
-
-$container->setDefinition('logger.stream_handle',$handleDefinition);
-
-
-//$logger = new Logger('main',array($container->get('logger.stream_handle')));
-//$container->set('logger',$handleDefinition);
-
-
+$container->compile();
 runApp($container);
+
+$elapsed = round((microtime(true) - $start) * 1000);
+$container->get('logger')->debug('Elapsed Time: '.$elapsed.'ms');
+
 function runApp(ContainerBuilder $builder){
     $builder->get('logger')->info('AAAA');
 }
